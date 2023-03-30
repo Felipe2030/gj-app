@@ -14,7 +14,7 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
+                <th style="text-align: center;">ID</th>
                 <th>Numero</th>
                 <th>Status</th>
                 <th>Categoria</th>
@@ -23,28 +23,42 @@
         <tbody>
         <?php if(!!$data): ?>
         <?php foreach ($data as $key => $row): ?>
-            <tr>
-                <td><?=$row["id"]?></td>
+            <tr class="checkout">
+                <td style="padding: 0px;width: 50px;"><button class="btnIndex"><?=$row["id"]?></button></td>
                 <td><?=$row["numero"]?></td>
                 <td><?=$row["status"]?></td>
                 <td><?=$row["categorias"]?></td>
-                <td>
-                    <button type="button" onclick="openModalVisualizar(<?=$row['id']?>)">Visualizar</button>
-                    <button type="button" onclick="openModalEdit(<?=$row['id']?>)">Editar</button>
-                </td>
             </tr>
         <?php endforeach; ?>
         <?php endif; ?>
         </tbody>
     </table>
     
-    <?php
-        for ($i = 1; $i <= $total_paginas; $i++) {
-            echo "<a class='paginacao' href='home.php?pagina=$i";
-            if (isset($_GET['busca'])) { echo "&busca=" . $_GET['busca']; } echo "'>$i</a> ";
-        }
-    ?>
-
+    <div class="container_update">
+        <div class="container_paginacao">
+            <?php
+                for ($i = 1; $i <= $total_paginas; $i++) {
+                    echo "<a class='paginacao' href='home.php?pagina=$i";
+                    if (isset($_GET['busca'])) { echo "&busca=" . $_GET['busca']; } echo "'>$i</a> ";
+                }
+            ?>
+        </div>
+        <div class="container_status_all">
+            <form id="ordemStatusAll" method="POST">
+                <label for="status">Status:</label>
+                <select name="status" id="status">
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Ausente">Ausente</option>
+                    <option value="Concluido">Concluido</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+                <button type="submit">Salvar</button>
+            </form>
+            <button style="background: #4CAF50;" type="button" id="modalVisualisar">Visualizar</button>
+            <button style="background: #333;" type="button" id="modalEditar">Editar</button>
+            <button style="background: red;" type="button" id="btnApagar">Apagar</button>
+        </div>
+    </div>
 
     <div id="myModalVisualizar" class="modal">
 		<!-- Conteúdo do modal -->
@@ -57,6 +71,9 @@
 
                 <label for="nome">Categorias:</label>
 				<input type="text" id="categoria_vi" name="categoria" disabled><br>
+
+                <label for="nome">Fornecedor:</label>
+				<input type="text" id="fornecedor_vi" name="fornecedor" disabled><br>
 
                 <label for="nome">Andamentos:</label>
                 <div id="listagem"></div>
@@ -81,10 +98,39 @@
                     <option value="Cancelado">Cancelado</option>
                 </select><br>
 
-                <label for="categoria">Categoria:</label>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label for="categoria">Categoria:</label>
+                    <div>
+                        <button style="width: 32px;" type="button" id="criarCategoria">+</button>
+                        <button style="width: 32px; background: red;" type="button" id="deletarCategoria">-</button>
+                        <button style="width: 46px;" class="d-none" id="salvarCategoria" type="button">salvar</button>
+                    </div>
+                </div>
+
+                <input id="inputCriarCategoria" class="d-none" type="text" placeholder="Digite uma categoria">
+
                 <select name="categoria" id="categoria">
-                    <option value="Cartão">Cartão</option>
-                    <option value="Shopee">Shopee</option>
+                    <?php foreach ($categirias as $key => $categiria): ?>
+                        <option value="<?=$categiria['id']?>"><?=$categiria['nome']?></option>
+                    <?php endforeach; ?>
+                </select><br>
+
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label for="categoria">Fornecedor:</label>
+                    <div>
+                        <button style="width: 32px;" type="button" id="criarFornecedor">+</button>
+                        <button style="width: 32px; background: red;" type="button" id="deletarFornecedor">-</button>
+                        <button style="width: 46px;" class="d-none" id="salvarFornecedor" type="button">salvar</button>
+                    </div>
+                </div>
+
+                <input id="inputCriarFornecedorNome" class="d-none" type="text" placeholder="Digite nome do fornecedor">
+                <input id="inputCriarFornecedorGanho" class="d-none" type="text" placeholder="Digite ganho da entrega">
+
+                <select name="fornecedor" id="fornecedor">
+                    <?php foreach ($fornecedores as $key => $fornecedor): ?>
+                        <option value="<?=$fornecedor['id']?>"><?=$fornecedor['nome']?></option>
+                    <?php endforeach; ?>
                 </select><br>
 				
 				<button type="submit">Cadastrar</button>
@@ -112,8 +158,16 @@
 
                 <label for="categoria">Categoria:</label>
                 <select name="categoria" id="categoria_ed">
-                    <option value="Cartão">Cartão</option>
-                    <option value="Shopee">Shopee</option>
+                    <?php foreach ($categirias as $key => $categiria): ?>
+                        <option value="<?=$categiria['id']?>"><?=$categiria['nome']?></option>
+                    <?php endforeach; ?>
+                </select><br>
+
+                <label for="fornecedor">Fornecedor:</label>
+                <select name="fornecedor" id="fornecedor_ed">
+                    <?php foreach ($fornecedores as $key => $fornecedor): ?>
+                        <option value="<?=$fornecedor['id']?>"><?=$fornecedor['nome']?></option>
+                    <?php endforeach; ?>
                 </select><br>
 				
 				<button type="submit">Editar</button>
@@ -123,8 +177,93 @@
 </div>
 
 <script>
+    let criarCategoria      = document.querySelector("#criarCategoria");
+    let inputCriarCategoria = document.querySelector("#inputCriarCategoria");
+    let salvarCategoria     = document.querySelector("#salvarCategoria");
+    let deletarCategoria    = document.querySelector("#deletarCategoria");
 
-     // Função para abrir o modal de cadastro
+    deletarCategoria.onclick = async () => {
+        let id = document.querySelector("#categoria option").value;
+        let data = new FormData();
+        data.append("id", id);
+
+        const response = await fetch("./actions/categorias/deletarActions.php",{ method: "POST", body: data });
+        const person   = await response.json();
+        alert(person.message);
+        if(person.status) window.location.href = "home.php"
+    }
+
+    criarCategoria.onclick = () => {
+        salvarCategoria.classList.remove("d-none");
+        criarCategoria.classList.add("d-none");
+        inputCriarCategoria.classList.remove("d-none");
+        deletarCategoria.classList.add("d-none");
+    }
+
+    salvarCategoria.onclick = async () => {
+        salvarCategoria.classList.add("d-none");
+        criarCategoria.classList.remove("d-none");
+        inputCriarCategoria.classList.add("d-none");
+        deletarCategoria.classList.remove("d-none");
+
+        let nome = inputCriarCategoria.value;
+
+        const data = new FormData();
+        data.append("nome", nome);
+
+        const response = await fetch("./actions/categorias/createActions.php",{ method: "POST", body: data });
+        const person   = await response.json();
+        alert(person.message);
+        if(person.status) window.location.href = "home.php";
+    }
+
+    let criarFornecedor = document.querySelector("#criarFornecedor");
+    let inputCriarFornecedorNome = document.querySelector("#inputCriarFornecedorNome");
+    let inputCriarFornecedorGanho = document.querySelector("#inputCriarFornecedorGanho");
+    let salvarFornecedor = document.querySelector("#salvarFornecedor");
+    let deletarFornecedor = document.querySelector("#deletarFornecedor");
+
+    deletarFornecedor.onclick = async () => {
+        let id = document.querySelector("#fornecedor option").value;
+        let data = new FormData();
+        data.append("id", id);
+
+        const response = await fetch("./actions/fornecedor/deletarActions.php",{ method: "POST", body: data });
+        const person   = await response.json();
+        alert(person.message);
+        if(person.status) window.location.href = "home.php"
+    }
+
+    criarFornecedor.onclick = () => {
+        salvarFornecedor.classList.remove("d-none");
+        criarFornecedor.classList.add("d-none");
+        inputCriarFornecedorNome.classList.remove("d-none");
+        inputCriarFornecedorGanho.classList.remove("d-none");
+        deletarFornecedor.classList.add("d-none");
+    }
+
+    salvarFornecedor.onclick = async () => {
+        salvarFornecedor.classList.add("d-none");
+        criarFornecedor.classList.remove("d-none");
+        inputCriarFornecedorNome.classList.add("d-none");
+        inputCriarFornecedorGanho.classList.add("d-none");
+        deletarFornecedor.classList.remove("d-none");
+
+        let nome  = inputCriarFornecedorNome.value;
+        let ganho = inputCriarFornecedorGanho.value;
+    
+
+        const data = new FormData();
+        data.append("nome", nome);
+        data.append("ganho", ganho);
+
+        const response = await fetch("./actions/fornecedor/createActions.php",{ method: "POST", body: data });
+        const person   = await response.json();
+        alert(person.message);
+        if(person.status) window.location.href = "home.php";
+    }
+
+    // Função para abrir o modal de cadastro
     async function openModalVisualizar(id) {
         const response = await fetch(`./actions/ordens/getIdGeralAction.php?id=${id}`,{ method: "GET" });
         const person   = await response.json();
@@ -173,6 +312,12 @@
             }
         })
 
+        document.querySelectorAll("#fornecedor_ed option").forEach((op) => {
+            if(op.value == person.fornecedor){
+                op.selected = true;
+            }
+        })
+
         document.querySelectorAll("#categoria_ed option").forEach((op) => {
             if(op.value == person.categorias){
                 op.selected = true;
@@ -207,4 +352,94 @@
         alert(person.message);
         window.location.href = "home.php";
     })
+
+    let checkouts = document.querySelectorAll(".checkout");
+
+    checkouts.forEach(checkout => {
+        checkout.addEventListener("click", (event) => {
+            let btn = checkout.querySelector("button");
+            btn.classList.toggle("active");
+        })
+    });
+
+    let formOrdemStatusAll = document.querySelector("#ordemStatusAll");
+
+    formOrdemStatusAll.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        let ids = [];
+        let data = new FormData(formOrdemStatusAll);
+        let checkouts = document.querySelectorAll(".checkout .active");
+        
+        if(checkouts.length == 0){
+            alert("Seleciona uma ou mais ordem");
+            return;
+        } 
+
+        checkouts.forEach(checkout => { ids.push(checkout.innerText); });
+        data.append("ids",JSON.stringify(ids));
+        
+        const response = await fetch("./actions/ordens/updateAllActions.php",{ method: "POST", body: data });
+        const person   = await response.json();
+        alert(person.message);
+        window.location.href = "home.php";
+    })
+
+   let modalVisualisar = document.querySelector("#modalVisualisar");
+   let modalEditar = document.querySelector("#modalEditar");
+   let btnApagar  = document.querySelector("#btnApagar");
+
+   modalVisualisar.onclick = () => {
+    let checkout = document.querySelectorAll(".checkout .active");
+
+    if(checkout.length == 0){
+        alert("Seleciona uma ordem");
+        return;
+    } 
+
+    if(checkout.length > 1){
+        alert("Seleciona somente uma ordem");
+        return;
+    } 
+
+    openModalVisualizar(checkout[0].innerText);
+   }
+
+   modalEditar.onclick = () => {
+    let checkout = document.querySelectorAll(".checkout .active");
+
+    if(checkout.length == 0){
+        alert("Seleciona uma ordem");
+        return;
+    } 
+
+    if(checkout.length > 1){
+        alert("Seleciona somente uma ordem");
+        return;
+    } 
+
+
+    openModalEdit(checkout[0].innerText);
+   }
+
+   btnApagar.onclick = async () => {
+        let ids = [];
+        let data = new FormData();
+        let checkouts = document.querySelectorAll(".checkout .active");
+
+        if(checkouts.length == 0){
+            alert("Seleciona uma ou mais ordem");
+            return;
+        } 
+
+        if (confirm("Voce está apagando ordens!") == true) {
+            checkouts.forEach(checkout => { ids.push(checkout.innerText); });
+            data.append("ids",JSON.stringify(ids));
+            
+            const response = await fetch("./actions/ordens/deletarAllActions.php",{ method: "POST", body: data });
+            const person   = await response.json();
+            alert(person.message);
+            window.location.href = "home.php";
+        }
+   }
 </script>

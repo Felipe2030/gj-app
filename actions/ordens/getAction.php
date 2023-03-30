@@ -4,6 +4,21 @@ include_once "dbconfig.php";
 
 $id_usuario = $_SESSION['usuario'];
 
+$sqlFornecedor = "SELECT * FROM fornecedor WHERE id_usuario = '$id_usuario'";
+$resultadoFornecedor = mysqli_query($conn, $sqlFornecedor);
+
+while($row = mysqli_fetch_assoc($resultadoFornecedor)){
+    $fornecedores[] = $row;
+}
+
+$sqlCategirias = "SELECT * FROM categorias WHERE id_usuario = '$id_usuario'";
+$resultadoCategorias = mysqli_query($conn, $sqlCategirias);
+
+while($row = mysqli_fetch_assoc($resultadoCategorias)){
+    $categirias[] = $row;
+}
+
+
 // Define o número de itens por página
 $itens_por_pagina = 10;
 

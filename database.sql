@@ -8,9 +8,24 @@ CREATE TABLE usuarios (
 CREATE TABLE ordens (
     id INT PRIMARY KEY AUTO_INCREMENT,
     numero VARCHAR(255)  NOT NULL,
-    categorias VARCHAR(255)  NOT NULL,
+    id_categorias INT NOT NULL,
+    id_usuario INT NOT NULL,
+    id_fornecedor INT NOT NULL
+);
+
+CREATE TABLE fornecedor (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255)  NOT NULL,
+    ganho_entrega VARCHAR(255)  NOT NULL,
     id_usuario INT NOT NULL
 );
+
+CREATE TABLE categorias (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255)  NOT NULL,
+    id_usuario INT NOT NULL
+);
+
 
 CREATE TABLE statusxordens (
     id INT PRIMARY KEY AUTO_INCREMENT,

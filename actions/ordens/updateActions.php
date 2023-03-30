@@ -31,6 +31,6 @@ try {
     echo json_encode($data);
 } catch(Exception $e) {
     $data['status']  = false;
-    $data['message'] = "Erro ao criar registro!";
+    $data['message'] = "Erro ao editar registro!";
     echo json_encode($data);
 }

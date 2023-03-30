@@ -6,6 +6,7 @@
 .container form {
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .container h1 {
@@ -226,4 +227,83 @@ tbody button {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 1.2em;
     font-weight: 700;
+}
+
+.container_update {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.container_status_all {
+    max-width: 500px;
+    width: 100%;
+}
+
+.container_status_all form label {
+    margin-right: 5px;
+    font-weight: 600;
+}
+
+.checkout {
+    cursor: pointer;
+}
+
+.checkout td .btnIndex {
+    width: 100%;
+    margin: 0px;
+    border-radius: 0px;
+    background: transparent;
+    color: #000;
+}
+
+.checkout td .active {
+    background:#cf3917;
+    color: #FFF;
+}
+
+.checkout td:nth-child(5) {
+   cursor: default;
+}
+
+.container_status_all {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.container_status_all button, .container_status_all form button  {
+    max-width: 100px;
+    width: 100%;
+    border: 0px;
+    border-radius: 2px;
+    background:#cf3917;
+    color: #FFF;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 2px;
+    height: 32px;
+    margin: 0px 2px;
+}
+
+.container_status_all form select {
+    width: 150px;
+}
+
+@media screen and (max-width: 500px) {
+    .container_status_all {
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+
+    .container_status_all button {
+        max-width: 100%;
+        margin: 4px 0px;
+    }
+}
+
+.d-none {
+    display: none;
 }
