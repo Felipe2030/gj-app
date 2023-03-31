@@ -8,9 +8,10 @@ $id         = isset($_POST['id']) ? $_POST['id'] : false;
 $id_usuario = $_SESSION['usuario'];
 $numero     = isset($_POST['numero']) ? $_POST['numero'] : false;
 $status     = isset($_POST['status']) ? $_POST['status'] : false;
-$categoria  = isset($_POST['categoria']) ? $_POST['categoria'] : false;
+$id_categorias  = isset($_POST['categoria']) ? $_POST['categoria'] : false;
+$id_fornecedor  = isset($_POST['fornecedor']) ? $_POST['fornecedor'] : false;
 
-if(!!!$numero || !!!$status || !!!$categoria):
+if(!!!$numero || !!!$status || !!!$id_categorias || !!!$id_fornecedor):
     $data['status']  = false;
     $data['message'] = "Preencha todos os campos!";
     echo json_encode($data);
@@ -19,9 +20,11 @@ endif;
 
 try {
     $sql = "INSERT INTO statusxordens (id_ordens, status) VALUES ('$id', '$status')";
-    $resultado = mysqli_query($conn, $sql);
+    $resultado_ordens = mysqli_query($conn, $sql);
 
-    $sql = "UPDATE ordens SET numero='$numero', categorias='$categoria', id_usuario='$id_usuario' WHERE id='$id'";
+    if(!$resultado_ordens) throw new Exception();
+
+    $sql = "UPDATE ordens SET numero='$numero', id_categorias='$id_categorias', id_usuario='$id_usuario', id_fornecedor='$id_fornecedor' WHERE id='$id'";
     $resultado = mysqli_query($conn, $sql);
 
     if(!$resultado) throw new Exception();

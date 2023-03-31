@@ -263,10 +263,6 @@ tbody button {
     color: #FFF;
 }
 
-.checkout td:nth-child(5) {
-   cursor: default;
-}
-
 .container_status_all {
     display: flex;
     align-items: center;

@@ -3,7 +3,7 @@
 <div class="container">
     <div class="relatorio">
         <h1>Listagem de Ordem</h1>
-        <a href="actions/ordens/relatorioAction.php" download="relatorio.xls">Relatório</a>
+        <a onclick="openModalRelatorio()">Relatório</a>
     </div>
     <form method="GET">
         <input type="text" name="busca" placeholder="Buscar">
@@ -18,6 +18,7 @@
                 <th>Numero</th>
                 <th>Status</th>
                 <th>Categoria</th>
+                <th>Fornecedor</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +28,22 @@
                 <td style="padding: 0px;width: 50px;"><button class="btnIndex"><?=$row["id"]?></button></td>
                 <td><?=$row["numero"]?></td>
                 <td><?=$row["status"]?></td>
-                <td><?=$row["categorias"]?></td>
+                <td>
+                    <?php 
+                        $id_categoria = $row["id_categorias"];
+                        echo array_reduce($categirias, function ($valorEncontrado, $objeto) use ($id_categoria) {
+                                return $valorEncontrado ?: ($objeto['id'] == $id_categoria ? $objeto['nome'] : null);
+                        })
+                    ?> 
+                </td>
+                <td>
+                    <?php 
+                        $id_fornecedor = $row["id_fornecedor"];
+                        echo array_reduce($fornecedores, function ($valorEncontrado, $objeto) use ($id_fornecedor) {
+                                return $valorEncontrado ?: ($objeto['id'] == $id_fornecedor ? $objeto['nome'] : null);
+                        })
+                    ?> 
+                </td>
             </tr>
         <?php endforeach; ?>
         <?php endif; ?>
@@ -116,7 +132,7 @@
                 </select><br>
 
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <label for="categoria">Fornecedor:</label>
+                    <label for="fornecedor">Fornecedor:</label>
                     <div>
                         <button style="width: 32px;" type="button" id="criarFornecedor">+</button>
                         <button style="width: 32px; background: red;" type="button" id="deletarFornecedor">-</button>
@@ -171,6 +187,48 @@
                 </select><br>
 				
 				<button type="submit">Editar</button>
+			</form>
+		</div>
+	</div>
+
+
+    <div id="myModalRelatorio" class="modal">
+		<div class="modal-content">
+			<span class="close" onclick="closeModalRelatorio()">&times;</span>
+			<h2>Gerador de Relatorios</h2>
+			<form id="ordemFormRelatorio" method="POST">
+                
+                <label for="data_inicial">Data inicial:</label>
+                <input type="date" name="data_inicial"><br>
+
+                <label for="data_termino">Data termino:</label>
+                <input type="date" name="data_termino"><br>
+
+                <label for="status">Status:</label>
+                <select name="status">
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Ausente">Ausente</option>
+                    <option value="Concluido">Concluido</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select><br>
+
+                <label for="categoria">Categoria:</label>
+                <select name="categoria">
+                    <option value=""></option>
+                    <?php foreach ($categirias as $key => $categiria): ?>
+                        <option value="<?=$categiria['id']?>"><?=$categiria['nome']?></option>
+                    <?php endforeach; ?>
+                </select><br>
+
+                <label for="fornecedor">Fornecedor:</label>
+                <select name="fornecedor">
+                    <option value=""></option>
+                    <?php foreach ($fornecedores as $key => $fornecedor): ?>
+                        <option value="<?=$fornecedor['id']?>"><?=$fornecedor['nome']?></option>
+                    <?php endforeach; ?>
+                </select><br>
+                
+				<button type="submit">Gerar</button>
 			</form>
 		</div>
 	</div>
@@ -267,10 +325,11 @@
     async function openModalVisualizar(id) {
         const response = await fetch(`./actions/ordens/getIdGeralAction.php?id=${id}`,{ method: "GET" });
         const person   = await response.json();
-
+     
         document.querySelector("#numero_vi").value = person[0].numero;
-        document.querySelector("#categoria_vi").value = person[0].categorias;
-        
+        document.querySelector("#categoria_vi").value = person[0].categoria;
+        document.querySelector("#fornecedor_vi").value = person[0].fornecedor;
+   
         let listagem   = ""
 
         person.forEach((e) => {
@@ -287,6 +346,13 @@
         document.getElementById("myModalVisualizar").style.display = "none";
     }
 
+    function openModalRelatorio() {
+        document.getElementById("myModalRelatorio").style.display = "block";
+    }
+
+    function closeModalRelatorio() {
+        document.getElementById("myModalRelatorio").style.display = "none";
+    }
 
     // Função para abrir o modal de cadastro
     function openModal() {
@@ -313,13 +379,13 @@
         })
 
         document.querySelectorAll("#fornecedor_ed option").forEach((op) => {
-            if(op.value == person.fornecedor){
+            if(op.value == person.id_fornecedor){
                 op.selected = true;
             }
         })
 
         document.querySelectorAll("#categoria_ed option").forEach((op) => {
-            if(op.value == person.categorias){
+            if(op.value == person.id_categorias){
                 op.selected = true;
             }
         })
@@ -353,6 +419,38 @@
         window.location.href = "home.php";
     })
 
+    const ordemFormRelatorio = document.querySelector("#ordemFormRelatorio");
+    ordemFormRelatorio.addEventListener("submit",async (event) => {
+        event.preventDefault();
+        const data         = new FormData(ordemFormRelatorio);
+        const data_inicial = data.get('data_inicial');
+        const data_termino = data.get('data_termino');
+        const status       = data.get('status');
+        const categoria    = data.get('categoria');
+        const fornecedor   = data.get('fornecedor');
+
+        if(!!!data_inicial || !!!data_termino || !!!status){
+            alert("Compos obrigatorios não selecionado!");
+            return;
+        }
+
+        let url = `./actions/relatorios/getActions.php?data_inicial=${data_inicial}&data_termino=${data_termino}&status=${status}`;
+        
+        if(!!categoria)  url += `&categoria=${categoria}`;
+        if(!!fornecedor) url += `&fornecedor=${fornecedor}`;
+        
+        const response = await fetch(url,{ method: "GET" });
+        const blob     = await response.blob();
+        const url_base = window.URL.createObjectURL(blob);
+        const link     = document.createElement('a');
+        link.href      = url_base;
+        link.download  = 'relatorio.xls';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    })
+
+    
     let checkouts = document.querySelectorAll(".checkout");
 
     checkouts.forEach(checkout => {

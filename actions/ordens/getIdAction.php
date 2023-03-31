@@ -10,6 +10,7 @@ foreach ($resultado as $key => $row) {
     $id  = $row['id'];
     $sql = "SELECT * FROM statusxordens WHERE id_ordens = '$id' ORDER BY id DESC LIMIT 1";
     $result_orden = mysqli_fetch_assoc($conn->query($sql));
+    
     $row['status'] = $result_orden['status'];
     $row['data']   = $result_orden['data'];
     $data[] = $row;

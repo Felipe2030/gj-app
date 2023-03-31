@@ -29,6 +29,8 @@
                 <th>Numero</th>
                 <th>Status</th>
                 <th>Categoria</th>
+                <th>Fornecedor</th>
+                <th>Ganho</th>
             </tr>
         </thead>
         <tbody>
@@ -38,7 +40,9 @@
                 <td><?=$row["id"]?></td>
                 <td><?=$row["numero"]?></td>
                 <td><?=$row["status"]?></td>
-                <td><?=$row["categorias"]?></td>
+                <td><?=$row["nome_categoria"]?></td>
+                <td><?=$row["nome_fornecedor"]?></td>
+                <td><?="R$ ".$row["ganho_entrega"]?></td>
             </tr>
         <?php endforeach; ?>
         <?php endif; ?>
@@ -58,11 +62,11 @@
 </div>
 
 <script>
-    var data = new Date();
-    var mes = String(data.getMonth() + 1).padStart(2, '0');
+    var data     = new Date();
+    var mes      = String(data.getMonth() + 1).padStart(2, '0');
     var urlAtual = window. location. href;
     var urlClass = new URL(urlAtual);
-    var busca = urlClass. searchParams. get("busca")
+    var busca    = urlClass.searchParams.get("busca")
 
     document.querySelectorAll("#busca option").forEach((op) => {
         if(!!busca){

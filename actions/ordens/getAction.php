@@ -28,17 +28,27 @@ if (isset($_GET['pagina'])) { $pagina_atual = $_GET['pagina'];
 // Define o limite para a busca no banco de dados
 $limite_inicial = ($pagina_atual - 1) * $itens_por_pagina;
 
-$sql = "SELECT * FROM ordens";
+$sql = "SELECT 
+    t1.id,
+    t1.id_categorias,
+    t1.id_fornecedor,
+    t1.id_usuario,
+    t1.numero,
+    t2.nome AS nome_categoria,
+    t3.nome AS nome_fornecedor 
+FROM ordens AS t1
+INNER JOIN categorias AS t2 ON t2.id = t1.id_categorias
+INNER JOIN fornecedor AS t3 ON t3.id = t1.id_fornecedor";
 
 // Adiciona a cláusula WHERE para filtrar os resultados com base na busca
 if (isset($_GET['busca']) && !empty($_GET['busca'])) {
     $busca = trim($_GET['busca']);
-    $sql .= " WHERE numero LIKE '%$busca%' OR categorias LIKE '$busca' AND id_usuario = '$id_usuario'";
+    $sql .= " WHERE t1.numero LIKE '%$busca%' OR t2.nome LIKE '%$busca%' OR t3.nome LIKE '%$busca%' AND t1.id_usuario = '$id_usuario'";
 }else{
-    $sql .= " WHERE id_usuario = '$id_usuario'";
+    $sql .= " WHERE t1.id_usuario = '$id_usuario'";
 }
 
-$sql .= " ORDER BY id DESC";
+$sql .= " ORDER BY t1.id DESC";
 $sql .= " LIMIT $limite_inicial, $itens_por_pagina";
 $result = $conn->query($sql);
 

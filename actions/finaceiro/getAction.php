@@ -4,12 +4,25 @@ include_once "dbconfig.php";
 
 $id_usuario = $_SESSION['usuario'];
 
-$sql = "SELECT * FROM ordens ORDER BY id DESC";
+$sql = "SELECT 
+    t1.id,
+    t1.id_categorias,
+    t1.id_fornecedor,
+    t1.id_usuario,
+    t1.numero,
+    t2.nome AS nome_categoria,
+    t3.nome AS nome_fornecedor,
+    t3.ganho_entrega
+FROM ordens AS t1
+INNER JOIN categorias AS t2 ON t2.id = t1.id_categorias
+INNER JOIN fornecedor AS t3 ON t3.id = t1.id_fornecedor
+WHERE t1.id_usuario = '$id_usuario'";
+
 $result = $conn->query($sql);
 
 foreach ($result as $key => $row) {
     $id  = $row['id'];
-    $sql = "SELECT * FROM statusxordens WHERE id_ordens = '$id' AND status = 'Concluido' ORDER BY id ASC LIMIT 1";
+    $sql = "SELECT * FROM statusxordens WHERE id_ordens = '$id' AND status = 'Concluido' ORDER BY id DESC LIMIT 1";
     $result_orden  = mysqli_fetch_assoc($conn->query($sql));
     $row['status'] = $result_orden['status'];
     $row['data']   = $result_orden['data'];
@@ -26,8 +39,14 @@ foreach ($result as $key => $row) {
     if($status_filtro) $data[] = $row;
 }
 
-$total_itens   = (!!$data) ? count($data) : 0;
-$total_ganhos  = (!!$data) ? count($data) * 2.00 : 0.00;
-$conn->close();
 
+$total_itens = (!!$data) ? count($data) : 0;
+
+if(!!$data){
+    foreach ($data as $key => $value) {
+        $total_ganhos  += $value['ganho_entrega'];
+    }
+} else {
+    $total_ganhos = 0.00;
+}
 
