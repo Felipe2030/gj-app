@@ -22,7 +22,7 @@
             </tr>
         </thead>
         <tbody>
-        <?php if(!!$data): ?>
+        <?php if(isset($data)): ?>
         <?php foreach ($data as $key => $row): ?>
             <tr class="checkout">
                 <td style="padding: 0px;width: 50px;"><button class="btnIndex"><?=$row["id"]?></button></td>
@@ -269,10 +269,13 @@
         const data = new FormData();
         data.append("nome", nome);
 
-        const response = await fetch("./actions/categorias/createActions.php",{ method: "POST", body: data });
-        const person   = await response.json();
-        alert(person.message);
-        if(person.status) window.location.href = "home.php";
+        const response  = await fetch("./actions/categorias/createActions.php",{ method: "POST", body: data });
+        const person    = await response.json();
+
+        const categoria = document.createElement("option");
+        categoria.innerText = person.value.nome;
+        categoria.value = person.value.id;
+        document.querySelector("#categoria").append(categoria);
     }
 
     let criarFornecedor = document.querySelector("#criarFornecedor");
@@ -317,8 +320,11 @@
 
         const response = await fetch("./actions/fornecedor/createActions.php",{ method: "POST", body: data });
         const person   = await response.json();
-        alert(person.message);
-        if(person.status) window.location.href = "home.php";
+
+        const fornecedor = document.createElement("option");
+        fornecedor.innerText = person.value.nome;
+        fornecedor.value = person.value.id;
+        document.querySelector("#fornecedor").append(fornecedor);
     }
 
     // Função para abrir o modal de cadastro

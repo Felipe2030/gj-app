@@ -34,7 +34,7 @@
             </tr>
         </thead>
         <tbody>
-        <?php if(!!$data): ?>
+        <?php if(isset($data)): ?>
         <?php foreach ($data as $key => $row): ?>
             <tr>
                 <td><?=$row["id"]?></td>

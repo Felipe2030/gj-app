@@ -40,9 +40,9 @@ foreach ($result as $key => $row) {
 }
 
 
-$total_itens = (!!$data) ? count($data) : 0;
+$total_itens = (isset($data)) ? count($data) : 0;
 
-if(!!$data){
+if(isset($data)){
     foreach ($data as $key => $value) {
         $total_ganhos  += $value['ganho_entrega'];
     }

@@ -16,7 +16,7 @@ try {
     $sql = "SELECT * FROM usuarios WHERE email='$email' AND password=md5('$password')";
     $resultado = mysqli_query($conn, $sql);
     
-    if(!$resultado) throw new Exception();
+    if(!mysqli_num_rows($resultado)) throw new Exception();
    
     session_start();
     $data = mysqli_fetch_assoc($resultado);
