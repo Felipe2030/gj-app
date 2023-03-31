@@ -20,7 +20,10 @@
             <tr>
                 <td><?=$row["id"]?></td>
                 <td><?=$row["email"]?></td>
-                <td><button type="button" onclick="openModal(<?=$row['id']?>)">Editar</button></td>
+                <td>
+                    <button type="button" onclick="openModal(<?=$row['id']?>)">Editar</button>
+                    <button style="background: red;" type="button" onclick="deletar(<?=$row['id']?>)">Apagar</button>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
@@ -63,6 +66,16 @@
         document.querySelector("#email").value = person.email;
         document.querySelector("#senha").value = person.abc;
         document.getElementById("myModal").style.display = "block";
+    }
+
+    async function deletar(id){
+        let data = new FormData();
+        data.append("id", id);
+
+        const response = await fetch("./actions/usuarios/deletarActions.php",{ method: "POST", body: data });
+        const person   = await response.json();
+        alert(person.message);
+        if(person.status) window.location.href = "usuarios.php"
     }
 
     // Função para fechar o modal de cadastro
