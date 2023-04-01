@@ -3,6 +3,7 @@
 include_once "../../dbconfig.php";
 
 session_start();
+date_default_timezone_set('America/Sao_Paulo');
 
 $id         = isset($_POST['id']) ? $_POST['id'] : false;
 $id_usuario = $_SESSION['usuario'];
@@ -18,8 +19,11 @@ if(!!!$numero || !!!$status || !!!$id_categorias || !!!$id_fornecedor):
     exit;
 endif;
 
+$timestamp = time();
+$data_formatada = date('Y-m-d H:i:s', $timestamp);
+
 try {
-    $sql = "INSERT INTO statusxordens (id_ordens, status) VALUES ('$id', '$status')";
+    $sql = "INSERT INTO statusxordens (id_ordens, status, data) VALUES ('$id', '$status', '$data_formatada')";
     $resultado_ordens = mysqli_query($conn, $sql);
 
     if(!$resultado_ordens) throw new Exception();

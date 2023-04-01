@@ -10,28 +10,31 @@ $id_categoria  = isset($_GET['categoria'])    ? $_GET['categoria']    : false;
 $id_fornecedor = isset($_GET['fornecedor'])   ? $_GET['fornecedor']   : false;
 $data_inicial  = isset($_GET['data_inicial']) ? $_GET['data_inicial'] : false;
 $data_termino  = isset($_GET['data_termino']) ? $_GET['data_termino'] : false;
+$all           = isset($_GET['all']) ? $_GET['all'] : false;
 
 $sql = "SELECT 
     DISTINCT t1.id_ordens, 
-    t1.status, 
+    t1.status,
     t1.data,
     t2.numero,
+    t2.id_usuario,
+    t2.id_categorias,
+    t2.id_fornecedor,
     t3.nome AS categoria,
     t4.nome AS fornecedor,
     t4.ganho_entrega
-FROM statusxordens AS t1
-    INNER JOIN ordens AS t2 ON t2.id = t1.id_ordens
-    INNER JOIN categorias AS t3 ON t3.id = t2.id_categorias
-    INNER JOIN fornecedor AS t4 ON t4.id = t2.id_fornecedor
-";
+ FROM statusxordens AS t1 
+ INNER JOIN ordens AS t2 ON t2.id = t1.id_ordens
+ INNER JOIN categorias AS t3 ON t3.id = t2.id_categorias
+ INNER JOIN fornecedor AS t4 ON t4.id = t2.id_fornecedor
+ WHERE t2.id_usuario = '$id_usuario'";
 
-$sql .=" WHERE t1.data >= '$data_inicial' AND t1.data <= '$data_termino' AND t1.status = '$status'";
-
+if(!!$status)  $sql .= " AND t1.status = '$status'"; 
 if(!!$id_categoria)  $sql .= " AND t2.id_categorias = '$id_categoria'"; 
 if(!!$id_fornecedor) $sql .= " AND t2.id_fornecedor = '$id_fornecedor'"; 
 
-$sql .=" AND t2.id_usuario = '$id_usuario'";
-$sql .=" ORDER BY t1.id_ordens DESC";
+$sql .= " AND DATE_FORMAT(t1.data, '%Y-%m-%d') BETWEEN '$data_inicial' AND '$data_termino'";
+$sql .= " ORDER BY t1.id_ordens DESC";
 
 $result = $conn->query($sql);
 

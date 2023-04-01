@@ -204,6 +204,12 @@
                 <label for="data_termino">Data termino:</label>
                 <input type="date" name="data_termino"><br>
 
+                <label for="data_termino" style="display: flex; align-items: center;justify-content: end;">Todos:  
+                    <input id="all" style="width: 20px;" type="checkbox" name="all" checked>
+                </label>
+              
+
+                <div id="all_status">
                 <label for="status">Status:</label>
                 <select name="status">
                     <option value="Em andamento">Em andamento</option>
@@ -227,6 +233,7 @@
                         <option value="<?=$fornecedor['id']?>"><?=$fornecedor['nome']?></option>
                     <?php endforeach; ?>
                 </select><br>
+                </div>
                 
 				<button type="submit">Gerar</button>
 			</form>
@@ -235,6 +242,18 @@
 </div>
 
 <script>
+
+    let all = document.querySelector("#all");
+    if(all.checked) document.querySelector("#all_status").style.display = "none";
+
+    all.onclick = () => {
+        if(all.checked){
+            document.querySelector("#all_status").style.display = "none";
+        } else {
+            document.querySelector("#all_status").style.display = "block";
+        }
+    }
+
     let criarCategoria      = document.querySelector("#criarCategoria");
     let inputCriarCategoria = document.querySelector("#inputCriarCategoria");
     let salvarCategoria     = document.querySelector("#salvarCategoria");
@@ -434,14 +453,16 @@
         const status       = data.get('status');
         const categoria    = data.get('categoria');
         const fornecedor   = data.get('fornecedor');
+        const all          = data.get('all');
 
-        if(!!!data_inicial || !!!data_termino || !!!status){
+        if(!!!data_inicial || !!!data_termino){
             alert("Compos obrigatorios não selecionado!");
             return;
         }
 
-        let url = `./actions/relatorios/getActions.php?data_inicial=${data_inicial}&data_termino=${data_termino}&status=${status}`;
+        let url = `./actions/relatorios/getActions.php?data_inicial=${data_inicial}&data_termino=${data_termino}&all=${all}`;
         
+        if(!!status)    url += `&status=${status}`;
         if(!!categoria)  url += `&categoria=${categoria}`;
         if(!!fornecedor) url += `&fornecedor=${fornecedor}`;
         

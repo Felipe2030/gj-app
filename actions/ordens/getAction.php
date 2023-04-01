@@ -62,7 +62,7 @@ foreach ($result as $key => $row) {
     $data[] = $row;
 }
 
-$sql = "SELECT count(*) as total FROM ordens";
+$sql = "SELECT count(*) as total FROM ordens WHERE id_usuario = '$id_usuario'";
 $result_total = mysqli_fetch_assoc($conn->query($sql));
 
 $total_itens   = $result_total["total"];
