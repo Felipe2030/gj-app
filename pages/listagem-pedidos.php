@@ -15,7 +15,7 @@
         <thead>
             <tr>
                 <th style="text-align: center;">ID</th>
-                <th>Numero</th>
+                <th>Codigo</th>
                 <th>Status</th>
                 <th>Categoria</th>
                 <th>Fornecedor</th>
@@ -103,8 +103,18 @@
 			<span class="close" onclick="closeModal()">&times;</span>
 			<h2>Cadastrar Ordem</h2>
 			<form id="ordemForm" method="POST">
-				<label for="nome">Numero:</label>
-				<input type="text" id="numero" name="numero"><br>
+                <br>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label for="numero">Codigo:</label>
+                    <div>
+                        <button style="width: 32px;" type="button" id="criarCodigo">+</button>
+                        <button style="width: 32px; background: red;" type="button" id="deletarCodigo">-</button>
+                    </div>
+                </div>
+                <div id="listCodigo">
+                    <input type="text" name="numero[]" placeholder="Digite o codigo do produto">
+                </div>
+
 
 				<label for="status">Status:</label>
                 <select name="status" id="status">
@@ -161,7 +171,7 @@
 			<h2>Editar Ordem</h2>
 			<form id="ordemFormEditar" method="POST">
                 <input type="hidden" name="id" id="idOrdem">
-				<label for="nome">Numero:</label>
+				<label for="nome">Codigo:</label>
 				<input type="text" id="numero_ed" name="numero"><br>
 
 				<label for="status">Status:</label>
@@ -242,6 +252,25 @@
 </div>
 
 <script>
+
+    const criarCodigo   = document.querySelector("#criarCodigo");
+    const deletarCodigo = document.querySelector("#deletarCodigo");
+    const listCodigo    = document.querySelector("#listCodigo");
+    
+    criarCodigo.onclick = () => {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = "numero[]";
+        input.placeholder = "Digite o codigo do produto";
+        listCodigo.appendChild(input);
+    }
+
+    deletarCodigo.onclick = () => {
+        const inputs = listCodigo.querySelectorAll("input");
+        const ultimoIndice = inputs.length - 1;
+        const ultimoItem = inputs[ultimoIndice];
+        ultimoItem.remove();
+    }
 
     let all = document.querySelector("#all");
     if(all.checked) document.querySelector("#all_status").style.display = "none";

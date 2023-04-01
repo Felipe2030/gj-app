@@ -19,7 +19,7 @@ $data_formatada = date('Y-m-d H:i:s', $timestamp);
 
 try {
     foreach($ids as $key => $id):
-        $sql = "INSERT INTO statusxordens (id_ordens, status, data) VALUES ('$id', '$status', $data_formatada)";
+        $sql = "INSERT INTO statusxordens (id_ordens, status, data) VALUES ('$id', '$status', '$data_formatada')";
         $resultado = mysqli_query($conn, $sql);
     endforeach;
 
